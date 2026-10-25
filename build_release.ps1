@@ -1,5 +1,5 @@
 param(
-    [string]$Version = "1.1.0"
+    [string]$Version = "1.2.0"
 )
 
 $ErrorActionPreference = "Stop"
@@ -48,6 +48,18 @@ CustomPngFileName = btn_list_custom.png
 # Setting type: Boolean
 # Default value: true
 ForceGamepadPromptsAlways = true
+
+[Hotkeys]
+
+## Enable in-game hotkeys to control button prompts.
+# Setting type: Boolean
+# Default value: true
+EnableHotkeys = true
+
+## Hotkey to cycle to the next controller button prompt style (Default: F9).
+# Setting type: KeyCode
+# Default value: F9
+HotkeyCycleStyle = F9
 "@
 
 Set-Content -Path (Join-Path $configTarget "com.sagafrontier.sagabuttonprompts.cfg") -Value $defaultCfg
@@ -56,3 +68,4 @@ Write-Host "Compressing release package to $zipPath..." -ForegroundColor Cyan
 Compress-Archive -Path (Join-Path $packageDir "*") -DestinationPath $zipPath -Force
 
 Write-Host "Release package successfully created at: $zipPath" -ForegroundColor Green
+

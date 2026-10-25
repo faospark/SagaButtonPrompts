@@ -15,6 +15,7 @@ A **BepInEx 6 (IL2CPP)** mod for **SaGa Frontier Remastered** (Steam) that repla
   - `Custom`: Loads any custom 23-icon horizontal sprite sheet (`1472x64` or equivalent aspect ratio) from disk.
 - **Dynamic Dialogue & Tag Replacement**: Patches TextMeshPro tags and `ButtonIconSpriteAssetContainer` to ensure in-game text prompts (`<sprite name="btn_list_steam_X">`) dynamically show the selected controller layout.
 - **Force Controller Prompts Option**: Configurable option to force controller prompt icons even when playing on PC / Steam Deck without an active gamepad detected.
+- **In-Game Hotkey Cycle (`F9`)**: Press **`F9`** anytime during gameplay to cycle through styles on-the-fly (`PS4` &rarr; `PS5` &rarr; `PS1` &rarr; `Switch` &rarr; `Xbox` &rarr; `Custom`) with instant UI updates and automatic config persistence.
 - **Live Reload Support**: Automatically reloads sprites when configuration entries change without requiring a game restart.
 
 ---
@@ -22,8 +23,8 @@ A **BepInEx 6 (IL2CPP)** mod for **SaGa Frontier Remastered** (Steam) that repla
 ## Requirements
 
 1. **SaGa Frontier Remastered** (Steam edition, 64-bit Windows)
-2. **BepInEx 6.0 Bleeding Edge (Unity IL2CPP x64)**
-   - Download the latest **`BepInEx_UnityIL2CPP_x64_*.zip`** from the [BepInEx Bleeding Edge Builds](https://builds.bepinex.dev/projects/bepinex_be).
+2. **BepInEx 6.0 (Unity IL2CPP x64)**
+   - Download **[BepInEx-Unity.IL2CPP-win-x64-6.0.0-pre.2.zip](https://github.com/BepInEx/BepInEx/releases/download/v6.0.0-pre.2/BepInEx-Unity.IL2CPP-win-x64-6.0.0-pre.2.zip)**.
 
 ---
 
@@ -42,7 +43,7 @@ In your Steam client:
 ---
 
 ### 2. Install BepInEx 6 (If not already installed)
-1. Download **`BepInEx_UnityIL2CPP_x64_*.zip`** (Bleeding Edge).
+1. Download **[BepInEx-Unity.IL2CPP-win-x64-6.0.0-pre.2.zip](https://github.com/BepInEx/BepInEx/releases/download/v6.0.0-pre.2/BepInEx-Unity.IL2CPP-win-x64-6.0.0-pre.2.zip)**.
 2. Extract the contents of the ZIP archive directly into your **`SaGa Frontier Remastered`** root folder.
 3. You should see `doorstop_config.ini`, `winhttp.dll` (or `version.dll`), and the `BepInEx/` directory alongside `SaGa Frontier Remastered.exe`.
 4. **Launch the game once via Steam**, then quit to desktop.
@@ -109,12 +110,30 @@ CustomPngFileName = btn_list_custom.png
 # Setting type: Boolean
 # Default value: true
 ForceGamepadPromptsAlways = true
+
+[Hotkeys]
+
+## Enable in-game hotkeys to control button prompts.
+# Setting type: Boolean
+# Default value: true
+EnableHotkeys = true
+
+## Hotkey to cycle to the next controller button prompt style (Default: F9).
+# Setting type: KeyCode
+# Default value: F9
+HotkeyCycleStyle = F9
 ```
 
-### Hot-Reloading Changes
-You do **not** need to restart the game to change button styles!
-1. Keep the game running.
-2. Change `PromptStyle = PS5` (or `PS1`, `Switch`, `Xbox`, `Custom`) in the `.cfg` file and save.
+### In-Game Hotkey (`F9`)
+You can cycle prompt styles on-the-fly without restarting the game or editing files:
+- Press **`F9`** anytime during gameplay to cycle to the next style (`PS4` &rarr; `PS5` &rarr; `PS1` &rarr; `Switch` &rarr; `Xbox` &rarr; `Custom`).
+- The mod immediately updates both UI button sprites and dialogue text tags, and automatically persists your selection to `com.sagafrontier.sagabuttonprompts.cfg`.
+- The hotkey can be rebound to any Unity `KeyCode` or disabled via `EnableHotkeys = false`.
+
+### Config File Hot-Reloading
+You can also change settings externally while the game is running:
+1. Edit `BepInEx/config/com.sagafrontier.sagabuttonprompts.cfg`.
+2. Change `PromptStyle = PS5` (or `PS1`, `Switch`, `Xbox`, `Custom`) and save.
 3. The mod will instantly hot-reload and update on-screen button icons immediately.
 
 ---

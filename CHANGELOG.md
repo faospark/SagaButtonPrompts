@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.2.0] - 2026-10-25
+
+### Added
+- **In-Game Hotkey Cycle (`F9`)**: Added configurable hotkey (`HotkeyCycleStyle`, default `F9`) to cycle sequentially through button prompt styles (`PS4` &rarr; `PS5` &rarr; `PS1` &rarr; `Switch` &rarr; `Xbox` &rarr; `Custom`) at runtime with automatic config persistence.
+- **Hotkeys Configuration Section**: Added `EnableHotkeys` toggle and configurable keybinding for prompt style cycling in `com.sagafrontier.sagabuttonprompts.cfg`.
+- **Direct BepInEx Download Link**: Updated installation guide with direct link to BepInEx 6.0.0-pre.2 IL2CPP x64 release.
+
+---
+
 ## [1.1.0] - 2026-10-25
 
 ### Added
@@ -33,3 +42,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Initial release replacing default Xbox controller button prompt icons in SaGa Frontier Remastered with PlayStation prompts using BepInEx 6 IL2CPP and Harmony.
+

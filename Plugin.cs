@@ -28,12 +28,15 @@ namespace SagaButtonPrompts
     {
         public const string PluginGuid = "com.sagafrontier.sagabuttonprompts";
         public const string PluginName = "SaGa Frontier Button Prompts";
-        public const string PluginVersion = "1.1.0";
+        public const string PluginVersion = "1.2.0";
 
+        internal static Plugin PluginInstance;
         internal static new ManualLogSource Log;
         internal static ConfigEntry<ButtonPromptStyle> PromptStyle;
         internal static ConfigEntry<string> CustomPngFileName;
         internal static ConfigEntry<bool> ForceGamepadPromptsAlways;
+        internal static ConfigEntry<bool> EnableHotkeys;
+        internal static ConfigEntry<KeyCode> HotkeyCycleStyle;
 
         internal static Texture2D CustomTexture;
         internal static Sprite[] CustomSprites = new Sprite[23];
@@ -44,6 +47,7 @@ namespace SagaButtonPrompts
 
         public override void Load()
         {
+            PluginInstance = this;
             Log = base.Log;
 
             PromptStyle = Config.Bind(
@@ -67,11 +71,25 @@ namespace SagaButtonPrompts
                 "If true, always display controller prompts even when no controller is currently detected (overrides keyboard prompts)."
             );
 
+            EnableHotkeys = Config.Bind(
+                "Hotkeys",
+                "EnableHotkeys",
+                true,
+                "Enable in-game hotkeys to control button prompts."
+            );
+
+            HotkeyCycleStyle = Config.Bind(
+                "Hotkeys",
+                "HotkeyCycleStyle",
+                KeyCode.F9,
+                "Hotkey to cycle to the next controller button prompt style (Default: F9)."
+            );
+
             PromptStyle.SettingChanged += OnStyleConfigChanged;
             CustomPngFileName.SettingChanged += OnStyleConfigChanged;
 
             Harmony.CreateAndPatchAll(typeof(Patches), PluginGuid);
-            Log.LogInfo($"{PluginName} v{PluginVersion} loaded! Current PromptStyle: {PromptStyle.Value}");
+            Log.LogInfo($"{PluginName} v{PluginVersion} loaded! Current PromptStyle: {PromptStyle.Value} | Hotkey: {HotkeyCycleStyle.Value}");
         }
 
         private static void OnStyleConfigChanged(object sender, EventArgs e)
@@ -82,6 +100,56 @@ namespace SagaButtonPrompts
                 CustomSprites[i] = null;
 
             RefreshAllLoadedContainers();
+        }
+
+        internal static void CycleNextPromptStyle()
+        {
+            var styles = (ButtonPromptStyle[])Enum.GetValues(typeof(ButtonPromptStyle));
+            int currentIndex = Array.IndexOf(styles, PromptStyle.Value);
+            int nextIndex = (currentIndex + 1) % styles.Length;
+
+            // If the next style is Custom, verify if custom PNG file actually exists on disk; if not, cycle past it
+            if (styles[nextIndex] == ButtonPromptStyle.Custom)
+            {
+                string customFile = GetSheetFileName(ButtonPromptStyle.Custom);
+                string dllDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                bool customExists = !string.IsNullOrEmpty(dllDir) && File.Exists(Path.Combine(dllDir, customFile));
+                if (!customExists)
+                {
+                    nextIndex = (nextIndex + 1) % styles.Length;
+                }
+            }
+
+            ButtonPromptStyle nextStyle = styles[nextIndex];
+            PromptStyle.Value = nextStyle;
+            try
+            {
+                PluginInstance?.Config?.Save();
+            }
+            catch (Exception ex)
+            {
+                Log.LogWarning($"Could not auto-save config on hotkey cycle: {ex.Message}");
+            }
+
+            Log.LogInfo($"[Hotkey {HotkeyCycleStyle.Value}] Switched controller prompt style to: {nextStyle}");
+        }
+
+        internal static void CheckHotkeys()
+        {
+            if (EnableHotkeys == null || !EnableHotkeys.Value)
+                return;
+
+            try
+            {
+                if (HotkeyCycleStyle != null && HotkeyCycleStyle.Value != KeyCode.None && Input.GetKeyDown(HotkeyCycleStyle.Value))
+                {
+                    CycleNextPromptStyle();
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.LogWarning($"Error in CheckHotkeys: {ex.Message}");
+            }
         }
 
         internal static void RefreshAllLoadedContainers()
@@ -380,6 +448,14 @@ namespace SagaButtonPrompts
             {
                 Plugin.ApplyToSpriteAsset(__result);
             }
+        }
+
+        // Poll hotkeys on each game frame
+        [HarmonyPatch(typeof(MainGame), nameof(MainGame.OnUpdate))]
+        [HarmonyPrefix]
+        public static void MainGame_OnUpdate_Prefix()
+        {
+            Plugin.CheckHotkeys();
         }
     }
 }
