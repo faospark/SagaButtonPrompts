@@ -51,3 +51,4 @@ dotnet build -c Release
 ```
 
 The build output is automatically copied to `../../BepInEx/plugins/SagaButtonPrompts/`.
+
