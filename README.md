@@ -1,31 +1,103 @@
 # SaGaButtonPrompts
 
-A BepInEx 6 (IL2CPP) mod for **SaGa Frontier Remastered** that replaces the default Xbox controller button prompt icons in the UI and dialogue text tags with customized PlayStation (PS4, PS5, PS1), Nintendo Switch, or user-supplied custom button glyphs.
+A **BepInEx 6 (IL2CPP)** mod for **SaGa Frontier Remastered** (Steam) that replaces the default Xbox controller button prompt icons in the UI and dialogue text tags with customized PlayStation (PS4, PS5, PS1), Nintendo Switch, or user-supplied custom button glyphs.
+
+---
 
 ## Features
 
-- **Multiple Prompt Styles**:
+- **Multiple Controller Prompt Styles**:
   - `PS4`: DualShock 4 styled button prompts with iconic colors (Cross, Circle, Square, Triangle, L1/R1, L2/R2, Options, Share/Touchpad).
   - `PS5`: DualSense styled button prompts (White / Modern minimal glyphs).
-  - `PS1`: Classic PSone grey styled button glyphs.
+  - `PS1`: Classic PSone retro grey styled button glyphs.
   - `Switch`: Nintendo Switch style button prompts (B/A/Y/X layout).
   - `Xbox`: Original Xbox prompt sheet.
   - `Custom`: Loads any custom 23-icon horizontal sprite sheet (`1472x64` or equivalent aspect ratio) from disk.
 - **Dynamic Dialogue & Tag Replacement**: Patches TextMeshPro tags and `ButtonIconSpriteAssetContainer` to ensure in-game text prompts (`<sprite name="btn_list_steam_X">`) dynamically show the selected controller layout.
 - **Force Controller Prompts Option**: Configurable option to force controller prompt icons even when playing on PC / Steam Deck without an active gamepad detected.
-- **Live Reload Support**: Automatically reloads sprites when configuration entries change.
+- **Live Reload Support**: Automatically reloads sprites when configuration entries change without requiring a game restart.
 
-## Configuration
+---
 
-Configuration is located at `BepInEx/config/com.sagafrontier.sagabuttonprompts.cfg`:
+## Requirements
+
+1. **SaGa Frontier Remastered** (Steam edition, 64-bit Windows)
+2. **BepInEx 6.0 Bleeding Edge (Unity IL2CPP x64)**
+   - Download the latest **`BepInEx_UnityIL2CPP_x64_*.zip`** from the [BepInEx Bleeding Edge Builds](https://builds.bepinex.dev/projects/bepinex_be).
+
+---
+
+## Installation Guide (Steam)
+
+### 1. Locate Game Root Directory
+In your Steam client:
+1. Open your **Library** and right-click **SaGa Frontier Remastered**.
+2. Select **Manage** &rarr; **Browse local files**.
+3. A file explorer window will open at your game's root directory:
+   ```text
+   ...\steamapps\common\SaGa Frontier Remastered\
+   ```
+   *(This folder contains `SaGa Frontier Remastered.exe`).*
+
+---
+
+### 2. Install BepInEx 6 (If not already installed)
+1. Download **`BepInEx_UnityIL2CPP_x64_*.zip`** (Bleeding Edge).
+2. Extract the contents of the ZIP archive directly into your **`SaGa Frontier Remastered`** root folder.
+3. You should see `doorstop_config.ini`, `winhttp.dll` (or `version.dll`), and the `BepInEx/` directory alongside `SaGa Frontier Remastered.exe`.
+4. **Launch the game once via Steam**, then quit to desktop.
+   - This generates necessary IL2CPP interop assemblies and configuration directories.
+
+---
+
+### 3. Install SaGaButtonPrompts
+The release package is bundled with the complete directory structure for instant drag-and-drop installation.
+
+1. Download **`SagaButtonPrompts-vX.X.X.zip`** from [Releases](https://github.com/faospark/SagaButtonPrompts/releases).
+2. Open the ZIP archive. You will see a `BepInEx` folder.
+3. **Drag and drop the `BepInEx` folder directly into your game's root directory**:
+   ```text
+   SaGa Frontier Remastered/
+   ├── BepInEx/
+   │   ├── config/
+   │   │   └── com.sagafrontier.sagabuttonprompts.cfg
+   │   └── plugins/
+   │       └── SagaButtonPrompts/
+   │           ├── SagaButtonPrompts.dll
+   │           ├── btn_list_ps4.png
+   │           ├── btn_list_ps5.png
+   │           ├── btn_list_ps1.png
+   │           └── btn_list_switch.png
+   ├── doorstop_config.ini
+   └── SaGa Frontier Remastered.exe
+   ```
+4. If prompted by Windows, choose **Replace the files in the destination**.
+
+---
+
+### 4. Verify Installation
+1. Start the game through Steam.
+2. If BepInEx console is enabled, you will see:
+   ```text
+   [Info   :   BepInEx] Loading [SaGa Frontier Button Prompts 1.1.0]
+   [Info   :SaGa Frontier Button Prompts] SaGa Frontier Button Prompts v1.1.0 loaded! Current PromptStyle: PS4
+   [Info   :SaGa Frontier Button Prompts] Loaded 'btn_list_ps4.png' for PromptStyle=PS4 (1472x64).
+   ```
+3. Your controller prompts in the title screen, battle menus, and dialogue boxes will now display PlayStation button glyphs.
+
+---
+
+## Configuration & Style Selection
+
+Edit `BepInEx/config/com.sagafrontier.sagabuttonprompts.cfg` with Notepad or any text editor:
 
 ```ini
 [General]
 
-## Controller button prompt style: PS4, PS5, PS1, Switch, Xbox, or Custom.
+## Controller button prompt style to display:
+## Options: PS4, PS5, PS1, Switch, Xbox, Custom
 # Setting type: ButtonPromptStyle
 # Default value: PS4
-# Acceptable values: PS4, PS5, PS1, Switch, Xbox, Custom
 PromptStyle = PS4
 
 ## PNG file name inside BepInEx/plugins/SagaButtonPrompts/ to use when PromptStyle = Custom.
@@ -39,16 +111,35 @@ CustomPngFileName = btn_list_custom.png
 ForceGamepadPromptsAlways = true
 ```
 
-## Building
+### Hot-Reloading Changes
+You do **not** need to restart the game to change button styles!
+1. Keep the game running.
+2. Change `PromptStyle = PS5` (or `PS1`, `Switch`, `Xbox`, `Custom`) in the `.cfg` file and save.
+3. The mod will instantly hot-reload and update on-screen button icons immediately.
+
+---
+
+## Building from Source
 
 Prerequisites:
 - [.NET 6.0 SDK](https://dotnet.microsoft.com/download/dotnet/6.0) or newer
-- BepInEx 6.x IL2CPP installed in the game directory
+- BepInEx 6.x IL2CPP installed in your game directory
 
-To build in Release configuration:
+To compile:
 ```bash
 dotnet build -c Release
 ```
 
-The build output is automatically copied to `../../BepInEx/plugins/SagaButtonPrompts/`.
+The build target automatically compiles the DLL and deploys it to `../../BepInEx/plugins/SagaButtonPrompts/`.
 
+---
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
+## Credits
+
+- **Author**: [faospark](https://github.com/faospark)
+- **Target Game**: SaGa Frontier Remastered (Square Enix)
+- **Framework**: [BepInEx](https://github.com/BepInEx/BepInEx) & [HarmonyX](https://github.com/BepInEx/HarmonyX)

@@ -1,6 +1,8 @@
 # Build and compilation outputs
 bin/
 obj/
+dist/
+*.zip
 *.suo
 *.user
 *.userosscache
